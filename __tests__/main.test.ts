@@ -217,6 +217,62 @@ describe('Testing all functions of class PipelineRunner', () => {
         expect(mockQueueBuild).toBeCalledWith(expectedBuild, 'my-project', true);
     });
 
+    test('start() - run using user-specified branch and version to trigger a run', async () => {
+        jest.spyOn(core, 'getInput').mockImplementation((input, options) => {
+            process.env['GITHUB_REPOSITORY'] = 'repo_name';
+            process.env['GITHUB_REF'] = 'releases';
+            process.env['GITHUB_SHA'] = 'sampleSha';
+
+            if (input == 'azure-devops-project-url') return 'https://dev.azure.com/organization/my-project';
+            if (input == 'azure-pipeline-name') return 'my-pipeline';
+            if (input == 'azure-devops-token') return 'my-token';
+            if (input == 'azure-pipeline-source-branch') return 'my-source-branch';
+            if (input == 'azure-pipeline-source-version') return 'my-source-version';
+        });
+        jest.spyOn(core, 'debug').mockImplementation();
+        jest.spyOn(core, 'info').mockImplementation();
+        mockBuildDefinitions = [{
+            id: 5
+        }];
+        mockBuildDefinition = {
+            id: 5,
+            repository: {
+                id: 'repo',
+                type: 'Devops'
+            },
+            project: {
+                id: 'my-project'
+            },
+        }
+        mockQueueBuildResult = {
+            _links: {
+                web: {
+                    href: 'linkToRun'
+                }
+            }
+        };
+
+        expect(await (new PipelineRunner(TaskParameters.getTaskParams())).start()).toBeUndefined();
+        expect(mockGetPersonalAccessTokenHandler).toBeCalledWith('my-token');
+        expect(mockGetBuildApi).toBeCalled();
+        expect(mockGetDefinitions).toBeCalledWith('my-project', 'my-pipeline');
+        expect(mockGetDefinition).toBeCalledWith('my-project', 5);
+        const expectedBuild = {
+            definition: {
+                id: 5,
+            },
+            project: {
+                id: 'my-project',
+            },
+            reason: 1967,
+            sourceBranch: 'my-source-branch',
+            sourceVersion: 'my-source-version',
+        }
+        expect(mockQueueBuild).toBeCalledWith(expectedBuild, 'my-project', true);
+        // expect(mockQueueBuild).toBeCalledWith(expectedBuild, 'my-source-branch', true);
+        // expect(mockQueueBuild).toBeCalledWith(expectedBuild, 'my-source-version', true);
+    });
+
     test('start() - set core failed in RunYamlPipeline if result has errors', async () => {
         jest.spyOn(core, 'getInput').mockImplementation((input, options) => {
             process.env['GITHUB_REPOSITORY'] = 'repo_name';

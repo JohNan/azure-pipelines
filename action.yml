@@ -12,7 +12,13 @@ inputs:
     required: false
   azure-devops-token: 
     description: 'Paste personal access token of the user as value of secret variable:AZURE_DEVOPS_TOKEN' 
-    required: true 
+    required: true
+  azure-devops-source-branch:
+    description: 'Specify to override the default branch ($GITHUB_REF)'
+    required: false
+  azure-devops-source-version:
+    description: 'Specify to override the default version ($GITHUB_SHA)'
+    required: false
 runs: 
-  using: 'node12' 
+  using: 'node16'
   main: 'lib/main.js' 
