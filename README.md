@@ -19,7 +19,9 @@ Action takes Project URL, pipeline name and a [Personal Access Token (PAT)](http
     azure-devops-project-url: 'https://dev.azure.com/organization/project-name'
     azure-pipeline-name: 'pipeline-name' # name of the Azure pipeline to be triggered
     azure-devops-token: '${{ secrets.AZURE_DEVOPS_TOKEN }}'
-    azure-pipeline-variables:  '{"variable1": "value1", "variable2": "value2"}' # optional stringified json
+    azure-pipeline-variables: '{"variable1": "value1", "variable2": "value2"}' # optional stringified json
+    azure-pipeline-source-branch: 'features/add-feature1' # optional Specify to override the default branch ($GITHUB_REF) 
+    azure-pipeline-source-version: 'e177c1017f7ecca85c72f06f55c8c84362e29e5a' # optional Specify to override the default version ($GITHUB_SHA)
 ```
 
 # Contributing
